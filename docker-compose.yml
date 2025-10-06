@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    container_name: winrm-backend
+    # No host port exposure; reachable only inside the network
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+      - WINRM_USERNAME=wavenet
+      - WINRM_PASSWORD=Hyper.24
+    restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend
+    container_name: winrm-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
