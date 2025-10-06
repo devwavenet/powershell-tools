@@ -351,7 +351,6 @@ const App = () => {
     <div className="min-h-screen bg-slate-100/40 pb-16">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12">
         <header className="text-center">
-          <p className="text-sm font-medium uppercase tracking-wide text-brand-700">Administración WinRM</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">ADMINISTRACION MEDIANTE WINRM</h1>
           <p className="mt-4 text-base text-slate-600">
             Conéctese a un servidor Windows vía WinRM sobre HTTPS (5986) y ejecute tareas.
@@ -363,8 +362,8 @@ const App = () => {
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Conexión</h2>
               <p className="text-sm text-slate-600">
-                Use las credenciales definidas en el backend. El usuario fijo es <span className="font-mono">wavenet</span>; solo
-                proporcione la contraseña si desea reemplazar la establecida en el servidor.
+                Autenticación fija con usuario <span className="font-mono">wavenet</span>. Ingrese la contraseña correspondiente
+                para el servidor remoto.
               </p>
             </div>
 
@@ -380,13 +379,13 @@ const App = () => {
               </label>
 
               <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-                Contraseña (opcional)
+                Contraseña
                 <input
                   className="input"
                   type="password"
                   value={connectForm.password ?? ''}
                   onChange={(event) => updateConnectField('password', event.target.value)}
-                  placeholder="Usar credencial por defecto"
+                  placeholder="Contraseña del usuario wavenet"
                 />
               </label>
 
