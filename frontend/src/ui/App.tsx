@@ -277,6 +277,10 @@ const App = () => {
     downloadTextFile('cambios-nombres.txt', lines)
   }
 
+  const handleNewConnection = () => {
+    window.location.reload()
+  }
+
   const formattedShutdownTime = useMemo(() => {
     if (!shutdownResult?.time) return null
     try {
@@ -429,10 +433,10 @@ const App = () => {
               <button
                 type="button"
                 className="btn-primary w-full sm:w-auto"
-                onClick={handleConnect}
-                disabled={isConnecting}
+                onClick={connectedHost ? handleNewConnection : handleConnect}
+                disabled={!connectedHost && isConnecting}
               >
-                {isConnecting ? 'Conectando…' : 'Probar conexión'}
+                {connectedHost ? 'Nueva conexión' : isConnecting ? 'Conectando…' : 'Conectar'}
               </button>
             </div>
 

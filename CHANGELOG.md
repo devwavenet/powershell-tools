@@ -9,3 +9,4 @@
 - Frontend actualizado con pestañas para cambio de contraseñas, renombrado, último apagado y nuevo módulo de conexiones RDP (incluye tabla, filtros y advertencias).
 - Ajustes de UI: título principal "ADMINISTRACION MEDIANTE WINRM", subtítulo simplificado, usuario fijo `wavenet` sin campo de entrada y contraseña obligatoria.
 - Eliminación del subtítulo adicional y textos redundantes en el encabezado para destacar el branding único.
+- Botón de conexión renombrado a "Conectar" y, tras conectarse, pasa a "Nueva conexión" recargando la interfaz para trabajar con otro servidor.
