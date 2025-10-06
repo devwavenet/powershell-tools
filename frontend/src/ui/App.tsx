@@ -119,7 +119,7 @@ const App = () => {
   const buildConnectPayload = (): ConnectBody => ({
     ...connectForm,
     host: connectForm.host.trim(),
-    username: normalizeString(connectForm.username),
+    username: 'wavenet',
     password: normalizeString(connectForm.password),
   })
 
@@ -352,10 +352,9 @@ const App = () => {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12">
         <header className="text-center">
           <p className="text-sm font-medium uppercase tracking-wide text-brand-700">Administración WinRM</p>
-          <h1 className="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">Panel de usuarios Windows</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">ADMINISTRACION MEDIANTE WINRM</h1>
           <p className="mt-4 text-base text-slate-600">
-            Conéctese a un servidor Windows vía WinRM sobre HTTPS (5986) y ejecute tareas de cambio de contraseñas o
-            renombrado de usuarios locales.
+            Conéctese a un servidor Windows vía WinRM sobre HTTPS (5986) y ejecute tareas.
           </p>
         </header>
 
@@ -364,8 +363,8 @@ const App = () => {
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Conexión</h2>
               <p className="text-sm text-slate-600">
-                Use las credenciales definidas en el backend (por defecto variables de entorno). Puede sobreescribirlas
-                ingresándolas aquí.
+                Use las credenciales definidas en el backend. El usuario fijo es <span className="font-mono">wavenet</span>; solo
+                proporcione la contraseña si desea reemplazar la establecida en el servidor.
               </p>
             </div>
 
@@ -377,16 +376,6 @@ const App = () => {
                   value={connectForm.host}
                   onChange={(event) => updateConnectField('host', event.target.value)}
                   placeholder="Ej: 10.0.0.12"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-                Usuario (opcional)
-                <input
-                  className="input"
-                  value={connectForm.username ?? ''}
-                  onChange={(event) => updateConnectField('username', event.target.value)}
-                  placeholder="Usar credencial por defecto"
                 />
               </label>
 

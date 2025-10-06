@@ -7,3 +7,4 @@
 - Endpoint `/system/last-shutdown` añadido para consultar el último apagado/reinicio (evento 1074).
 - Normalización de la actualización de `FullName` al renombrar usuarios sin modificar la descripción.
 - Frontend actualizado con pestañas para cambio de contraseñas, renombrado, último apagado y nuevo módulo de conexiones RDP (incluye tabla, filtros y advertencias).
+- Ajustes de UI: título principal "ADMINISTRACION MEDIANTE WINRM", subtítulo simplificado y usuario fijo `wavenet` sin campo de entrada.
