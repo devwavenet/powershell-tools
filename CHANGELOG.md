@@ -8,3 +8,4 @@
 - Normalización de la actualización de `FullName` al renombrar usuarios sin modificar la descripción.
 - Frontend actualizado con pestañas para cambio de contraseñas, renombrado, último apagado y nuevo módulo de conexiones RDP (incluye tabla, filtros y advertencias).
 - Ajustes de UI: título principal "ADMINISTRACION MEDIANTE WINRM", subtítulo simplificado, usuario fijo `wavenet` sin campo de entrada y contraseña obligatoria.
+- Eliminación del subtítulo adicional y textos redundantes en el encabezado para destacar el branding único.
