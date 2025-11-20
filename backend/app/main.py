@@ -232,6 +232,59 @@ def change_passwords(body: PasswordChangeBody):
     return {"ok": True, "changed": changed, "failed": failed}
 
 
+@app.post("/users/count")
+def count_local_users(body: ConnectBody):
+    ps = r'''
+    $excluidos = @("WDAGUtilityAccount", "administrator", "wavenet", "DefaultAccount", "Guest")
+    try {
+        $usuarios = Get-WmiObject Win32_UserAccount -ErrorAction Stop | Where-Object {
+            $_.LocalAccount -eq $true -and
+            $_.Disabled -eq $false -and
+            $_.Name -notin $excluidos -and
+            $_.Name -notlike "MSSQLSERVER*" -and
+            $_.Name -notlike "SQLEXPRESS*" -and
+            $_.Name -notlike "BEJERMAN*"
+        }
+        $cantidad = ($usuarios | Measure-Object).Count
+        [pscustomobject]@{
+            status = 'ok'
+            count = $cantidad
+            excluded = $excluidos
+        } | ConvertTo-Json -Compress
+    } catch {
+        [pscustomobject]@{
+            status = 'error'
+            count = 0
+            excluded = $excluidos
+            message = $_.Exception.Message
+        } | ConvertTo-Json -Compress
+    }
+    '''
+
+    out = run_ps(body.host, body.username, body.password, ps, use_https=body.use_https, port=body.port, ignore_cert=body.ignore_cert)
+
+    try:
+        data = json.loads(out) if out else {}
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail=f"Respuesta inesperada del host: {out}")
+
+    if not isinstance(data, dict):
+        raise HTTPException(status_code=400, detail=f"Formato inesperado del host: {out}")
+
+    if str(data.get("status")) != "ok":
+        raise HTTPException(status_code=400, detail=data.get("message") or "No se pudo obtener la cantidad de usuarios.")
+
+    count_value = data.get("count", 0)
+    try:
+        count_value = int(count_value)
+    except (TypeError, ValueError):
+        count_value = 0
+
+    excluded_list = data.get("excluded") if isinstance(data.get("excluded"), list) else []
+
+    return {"ok": True, "count": count_value, "excluded": excluded_list}
+
+
 @app.post("/users/rename")
 def rename_users(body: RenameUsersBody):
     if len(body.current_names) != len(body.new_names):

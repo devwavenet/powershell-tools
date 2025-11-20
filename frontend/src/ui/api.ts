@@ -33,6 +33,11 @@ export async function apiRenameUsers(body: ConnectBody & { current_names: string
   return data
 }
 
+export async function apiCountLocalUsers(body: ConnectBody): Promise<{ count: number; excluded?: string[] }> {
+  const { data } = await http.post(`/users/count`, body)
+  return data
+}
+
 export async function apiHealth(): Promise<{ status: string }> {
   const { data } = await http.get(`/health`)
   return data

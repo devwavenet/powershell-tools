@@ -4,6 +4,7 @@ import type { ConnectBody } from './api'
 import {
   apiChangePasswords,
   apiConnect,
+  apiCountLocalUsers,
   apiLastShutdown,
   apiRdpConnections,
   apiRenameUsers,
@@ -71,7 +72,7 @@ const App = () => {
   const [connectedHost, setConnectedHost] = useState<string | null>(null)
   const [hostname, setHostname] = useState<string | null>(null)
 
-  const [activePanel, setActivePanel] = useState<'passwords' | 'rename' | 'shutdown' | 'rdp'>('passwords')
+  const [activePanel, setActivePanel] = useState<'passwords' | 'rename' | 'shutdown' | 'rdp' | 'userCount'>('passwords')
 
   const [usersInput, setUsersInput] = useState('')
   const usersList = useMemo(() => parseList(usersInput), [usersInput])
@@ -89,6 +90,14 @@ const App = () => {
   const [isRenamingUsers, setIsRenamingUsers] = useState(false)
   const [renameResult, setRenameResult] = useState<RenameResult | null>(null)
   const [renameError, setRenameError] = useState<string | null>(null)
+
+  const [userCount, setUserCount] = useState<number | null>(null)
+  const [userCountError, setUserCountError] = useState<string | null>(null)
+  const [isFetchingUserCount, setIsFetchingUserCount] = useState(false)
+  const excludedAccounts = useMemo(
+    () => ['WDAGUtilityAccount', 'administrator', 'wavenet', 'DefaultAccount', 'Guest'],
+    []
+  )
 
   const [shutdownResult, setShutdownResult] = useState<ShutdownEvent | null>(null)
   const [shutdownError, setShutdownError] = useState<string | null>(null)
@@ -127,6 +136,8 @@ const App = () => {
     setConnectError(null)
     setPasswordResult(null)
     setRenameResult(null)
+    setUserCount(null)
+    setUserCountError(null)
     setShutdownResult(null)
     setShutdownError(null)
     setRdpResult(null)
@@ -259,6 +270,27 @@ const App = () => {
       setRenameError(getErrorMessage(error))
     } finally {
       setIsRenamingUsers(false)
+    }
+  }
+
+  const handleFetchUserCount = async () => {
+    setUserCountError(null)
+    setUserCount(null)
+
+    if (!connectedHost) {
+      setUserCountError('Realice primero la conexión con el servidor')
+      return
+    }
+
+    setIsFetchingUserCount(true)
+    try {
+      const payload = buildConnectPayload()
+      const { count } = await apiCountLocalUsers(payload)
+      setUserCount(count)
+    } catch (error) {
+      setUserCountError(getErrorMessage(error))
+    } finally {
+      setIsFetchingUserCount(false)
     }
   }
 
@@ -487,6 +519,18 @@ const App = () => {
                     }`}
                 >
                   Cambio de nombre de usuarios
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePanel('userCount')}
+                  className={`rounded-lg px-4 py-2 text-left text-sm font-medium transition
+                    ${
+                      activePanel === 'userCount'
+                        ? 'bg-brand-600 text-white shadow'
+                        : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                    }`}
+                >
+                  Cantidad de usuarios locales
                 </button>
                 <button
                   type="button"
@@ -746,6 +790,55 @@ const App = () => {
                           )}
                         </div>
                       </div>
+                    </div>
+                  )}
+                </div>
+              ) : activePanel === 'userCount' ? (
+                <div className="flex flex-col gap-6">
+                  <header>
+                    <h3 className="text-xl font-semibold text-slate-900">Cantidad de usuarios locales</h3>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Ejecuta un script de PowerShell que cuenta los usuarios locales habilitados excluyendo cuentas de sistema y prefijos de SQL.
+                    </p>
+                  </header>
+
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                    <p className="font-medium text-slate-700">Se excluyen automáticamente:</p>
+                    <ul className="mt-2 list-disc pl-5 text-slate-700">
+                      {excludedAccounts.map((account) => (
+                        <li key={account} className="font-mono text-xs sm:text-sm">
+                          {account}
+                        </li>
+                      ))}
+                      <li className="font-mono text-xs sm:text-sm">MSSQLSERVER*</li>
+                      <li className="font-mono text-xs sm:text-sm">SQLEXPRESS*</li>
+                      <li className="font-mono text-xs sm:text-sm">BEJERMAN*</li>
+                    </ul>
+                    <p className="mt-3 text-xs text-slate-600">
+                      Solo se cuentan cuentas locales habilitadas (`LocalAccount` = True y no deshabilitadas).
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    {userCountError && (
+                      <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{userCountError}</p>
+                    )}
+                    <div className="flex flex-1 justify-end">
+                      <button
+                        type="button"
+                        onClick={handleFetchUserCount}
+                        className="btn-primary w-full sm:w-auto"
+                        disabled={isFetchingUserCount}
+                      >
+                        {isFetchingUserCount ? 'Consultando…' : 'Contar usuarios'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {userCount !== null && (
+                    <div className="rounded-xl border border-brand-100 bg-brand-50/60 p-4 text-sm text-slate-700">
+                      <p className="font-semibold text-brand-700">Usuarios locales habilitados: {userCount}</p>
+                      <p className="mt-1 text-slate-600">Incluye solo cuentas locales no deshabilitadas que no están en la lista de exclusión.</p>
                     </div>
                   )}
                 </div>
